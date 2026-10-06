@@ -38,4 +38,20 @@ class AccountEdgeCaseTest {
         assertThrows(InvalidAccountStateException.class, () -> account.deposit(new BigDecimal("1")));
         assertThrows(InvalidAccountStateException.class, () -> account.withdraw(new BigDecimal("1")));
     }
+    @Test
+    void shouldNotCloseAccountThatStillHasMoney() {
+        Account account = new Account("A-1", "Alice");
+        account.deposit(new BigDecimal("10.00"));
+
+        assertThrows(InvalidAccountStateException.class, account::close);
+        assertEquals(AccountStatus.ACTIVE, account.getStatus());
+    }
+
+    @Test
+    void shouldNotCloseTwice() {
+        Account account = new Account("A-1", "Alice");
+        account.close();
+
+        assertThrows(InvalidAccountStateException.class, account::close);
+    }
 }

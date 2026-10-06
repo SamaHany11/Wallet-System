@@ -1,5 +1,7 @@
 package com.example.wallet.transaction;
 
+import com.example.wallet.common.AmountRules;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
@@ -20,10 +22,11 @@ public class Transaction {
 
     public Transaction(String id, String accountId, TransactionType type, BigDecimal amount,
                        Instant createdAt, TransactionStatus status) {
+        AmountRules.requirePositive(amount);
         this.id = Objects.requireNonNull(id);
         this.accountId = Objects.requireNonNull(accountId);
         this.type = Objects.requireNonNull(type);
-        this.amount = Objects.requireNonNull(amount);
+        this.amount = amount;
         this.createdAt = Objects.requireNonNull(createdAt);
         this.status = Objects.requireNonNull(status);
     }

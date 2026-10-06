@@ -1,27 +1,38 @@
 package com.example.wallet.transaction;
 
+import com.example.wallet.exception.DuplicateTransactionException;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TransactionService {
 
     private final List<Transaction> transactions = new ArrayList<>();
+    private final Set<String> recordedIds = new HashSet<>();
 
     public Transaction record(String accountId, TransactionType type, BigDecimal amount) {
-        // TODO: validate input and prevent duplicate processing where appropriate.
-        Transaction transaction = new Transaction(accountId, type, amount);
+        return record(new Transaction(accountId, type, amount));
+    }
+
+    public Transaction record(Transaction transaction) {
+        if (!recordedIds.add(transaction.getId())) {
+            throw new DuplicateTransactionException("Transaction already recorded: " + transaction.getId());
+        }
         transactions.add(transaction);
         return transaction;
     }
 
     public List<Transaction> findByAccountId(String accountId) {
-        // TODO: avoid leaking mutable internal state and return transactions for the account.
-        return Collections.unmodifiableList(
-                transactions.stream()
-                        .filter(t -> t.getAccountId().equals(accountId))
-                        .toList()
-        );
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            if (transaction.getAccountId().equals(accountId)) {
+                result.add(transaction);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 }

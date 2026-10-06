@@ -1,5 +1,6 @@
 package com.example.wallet.account;
 
+import com.example.wallet.common.AmountRules;
 import com.example.wallet.exception.InsufficientBalanceException;
 import com.example.wallet.exception.InvalidAccountStateException;
 import com.example.wallet.exception.InvalidAmountException;
@@ -37,23 +38,19 @@ public class Account {
     }
 
     public void ensureCanDeposit(BigDecimal amount) {
-        requirePositive(amount);
+        AmountRules.requirePositive(amount);
         ensureActive();
     }
 
     public void ensureCanWithdraw(BigDecimal amount) {
-        requirePositive(amount);
+        AmountRules.requirePositive(amount);
         ensureActive();
         if (balance.compareTo(amount) < 0) {
             throw new InsufficientBalanceException("Insufficient balance");
         }
     }
 
-    private void requirePositive(BigDecimal amount) {
-        if (amount == null || amount.signum() <= 0) {
-            throw new InvalidAmountException("Amount must be greater than zero");
-        }
-    }
+
     public void suspend() {
         if (status == AccountStatus.CLOSED) {
             throw new InvalidAccountStateException("A closed account cannot be suspended");
