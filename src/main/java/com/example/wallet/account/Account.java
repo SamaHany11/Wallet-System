@@ -27,12 +27,11 @@ public class Account {
     public AccountStatus getStatus() { return status; }
 
     public void deposit(BigDecimal amount) {
-        // TODO: validate the amount and account state, then update the balance.
         if (amount == null || amount.signum() <= 0) {
             throw new InvalidAmountException("Amount must be greater than zero");
         }
-        // TODO: update the balance after validation.
-        // Intentionally incomplete for the challenge.
+        ensureActive();
+        balance = balance.add(amount);
     }
 
     public void withdraw(BigDecimal amount) {
