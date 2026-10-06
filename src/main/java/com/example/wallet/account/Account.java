@@ -27,24 +27,33 @@ public class Account {
     public AccountStatus getStatus() { return status; }
 
     public void deposit(BigDecimal amount) {
-        if (amount == null || amount.signum() <= 0) {
-            throw new InvalidAmountException("Amount must be greater than zero");
-        }
-        ensureActive();
+        ensureCanDeposit(amount);
         balance = balance.add(amount);
     }
 
     public void withdraw(BigDecimal amount) {
-        // TODO: validate account state and ensure sufficient balance.
-        if (amount == null || amount.signum() <= 0) {
-            throw new InvalidAmountException("Amount must be greater than zero");
-        }
-        if (balance.compareTo(amount) < 0) {
-            throw new InsufficientBalanceException("Insufficient balance");
-        }
+        ensureCanWithdraw(amount);
         balance = balance.subtract(amount);
     }
 
+    public void ensureCanDeposit(BigDecimal amount) {
+        requirePositive(amount);
+        ensureActive();
+    }
+
+    public void ensureCanWithdraw(BigDecimal amount) {
+        requirePositive(amount);
+        ensureActive();
+        if (balance.compareTo(amount) < 0) {
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+    }
+
+    private void requirePositive(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0) {
+            throw new InvalidAmountException("Amount must be greater than zero");
+        }
+    }
     public void suspend() {
         status = AccountStatus.SUSPENDED;
     }
