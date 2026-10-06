@@ -1,0 +1,6 @@
+Project: Digital Wallet Java SWE Challenge
+Java: 17
+Build: Maven
+Tests: JUnit 5
+Main class: com.example.wallet.WalletApplication
+Intent: Partially implemented real-life domain challenge with happy-path unit tests.
