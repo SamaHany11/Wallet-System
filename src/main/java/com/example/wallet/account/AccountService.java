@@ -1,6 +1,7 @@
 package com.example.wallet.account;
 
 import com.example.wallet.exception.AccountNotFoundException;
+import com.example.wallet.exception.DuplicateAccountException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,9 @@ public class AccountService {
     private final Map<String, Account> accounts = new HashMap<>();
 
     public Account createAccount(String id, String ownerName) {
-        // TODO: reject duplicate IDs and create the account.
+        if (accounts.containsKey(id)) {
+            throw new DuplicateAccountException("Account already exists: " + id);
+        }
         Account account = new Account(id, ownerName);
         accounts.put(id, account);
         return account;

@@ -55,11 +55,19 @@ public class Account {
         }
     }
     public void suspend() {
+        if (status == AccountStatus.CLOSED) {
+            throw new InvalidAccountStateException("A closed account cannot be suspended");
+        }
         status = AccountStatus.SUSPENDED;
     }
 
     public void close() {
-        // TODO: decide which business rule should apply before closing.
+        if (status == AccountStatus.CLOSED) {
+            throw new InvalidAccountStateException("Account is already closed");
+        }
+        if (balance.signum() != 0) {
+            throw new InvalidAccountStateException("Withdraw the remaining balance before closing the account");
+        }
         status = AccountStatus.CLOSED;
     }
 
