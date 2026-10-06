@@ -1,5 +1,6 @@
 package com.example.wallet.account;
 
+import com.example.wallet.common.AmountRules;
 import com.example.wallet.exception.InsufficientBalanceException;
 import com.example.wallet.exception.InvalidAccountStateException;
 import com.example.wallet.exception.InvalidAmountException;
@@ -27,31 +28,43 @@ public class Account {
     public AccountStatus getStatus() { return status; }
 
     public void deposit(BigDecimal amount) {
-        // TODO: validate the amount and account state, then update the balance.
-        if (amount == null || amount.signum() <= 0) {
-            throw new InvalidAmountException("Amount must be greater than zero");
-        }
-        // TODO: update the balance after validation.
-        // Intentionally incomplete for the challenge.
+        ensureCanDeposit(amount);
+        balance = balance.add(amount);
     }
 
     public void withdraw(BigDecimal amount) {
-        // TODO: validate account state and ensure sufficient balance.
-        if (amount == null || amount.signum() <= 0) {
-            throw new InvalidAmountException("Amount must be greater than zero");
-        }
-        if (balance.compareTo(amount) < 0) {
-            throw new InsufficientBalanceException("Insufficient balance");
-        }
+        ensureCanWithdraw(amount);
         balance = balance.subtract(amount);
     }
 
+    public void ensureCanDeposit(BigDecimal amount) {
+        AmountRules.requirePositive(amount);
+        ensureActive();
+    }
+
+    public void ensureCanWithdraw(BigDecimal amount) {
+        AmountRules.requirePositive(amount);
+        ensureActive();
+        if (balance.compareTo(amount) < 0) {
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+    }
+
+
     public void suspend() {
+        if (status == AccountStatus.CLOSED) {
+            throw new InvalidAccountStateException("A closed account cannot be suspended");
+        }
         status = AccountStatus.SUSPENDED;
     }
 
     public void close() {
-        // TODO: decide which business rule should apply before closing.
+        if (status == AccountStatus.CLOSED) {
+            throw new InvalidAccountStateException("Account is already closed");
+        }
+        if (balance.signum() != 0) {
+            throw new InvalidAccountStateException("Withdraw the remaining balance before closing the account");
+        }
         status = AccountStatus.CLOSED;
     }
 
